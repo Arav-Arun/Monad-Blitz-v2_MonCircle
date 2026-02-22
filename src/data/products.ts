@@ -293,8 +293,11 @@ export const PRODUCTS: Product[] = [
   },
 ];
 
-export const getMONEarned = (price: number, monEarnRate: number) =>
-  Math.round((price / 100) * monEarnRate * 100);
+export const getMONEarned = (price: number) => {
+  const REWARD_ALLOCATION = 0.01;
+  const CONVERSION_RATE = 1.83;
+  return (price * REWARD_ALLOCATION) / CONVERSION_RATE;
+};
 
 export const getFeaturedProducts = () => PRODUCTS.filter((p) => p.featured);
 

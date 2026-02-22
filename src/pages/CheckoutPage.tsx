@@ -3,8 +3,10 @@ import { Link } from "react-router-dom";
 import { CheckCircle, CreditCard, Lock, Truck } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useTheme } from "../context/ThemeContext";
+import { useAuth } from "../context/AuthContext";
 import CheckoutMonCard from "../components/CheckoutMonCard";
 import RewardPanel from "../components/RewardPanel";
+import ScratchCard from "../components/ScratchCard";
 
 type Step = "shipping" | "payment" | "review";
 
@@ -19,28 +21,71 @@ interface ShippingData {
 }
 
 const INITIAL_SHIPPING: ShippingData = {
-  name: "",
-  email: "",
-  phone: "",
-  address: "",
-  city: "",
-  state: "",
-  zip: "",
+  name: "Arjun Singh",
+  email: "arjun@example.com",
+  phone: "+91 98765 43210",
+  address: "123, Monad Tower, Brigade Road",
+  city: "Bangalore",
+  state: "Karnataka",
+  zip: "560001",
 };
 
 export default function CheckoutPage() {
-  const { state, cartTotal, totalMONEarned, monDiscount, dispatch } = useCart();
+  const { 
+    state, 
+    cartTotal, 
+    totalMONEarned, 
+    monDiscount, 
+    dispatch, 
+    monEarnedBreakdown, 
+    monRedemptionBreakdown 
+  } = useCart();
   const { c } = useTheme();
+  const { user } = useAuth();
   const [step, setStep] = useState<Step>("shipping");
   const [shipping, setShipping] = useState<ShippingData>(INITIAL_SHIPPING);
   const [placed, setPlaced] = useState(false);
+  const [finalEarnedMON, setFinalEarnedMON] = useState(0);
 
   const finalTotal = Math.round(cartTotal - monDiscount);
   const taxes = Math.round(cartTotal * 0.18);
 
-  const handlePlaceOrder = () => {
-    setPlaced(true);
-    setTimeout(() => dispatch({ type: "CLEAR_CART" }), 100);
+  const handlePlaceOrder = async () => {
+    try {
+      // 1. Save order to our new MonMart backend (server.js)
+      const orderId = "ORD-" + Math.random().toString(36).slice(2, 9).toUpperCase();
+      await fetch('http://localhost:5000/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId,
+          total: finalTotal + taxes,
+          userId: user?.id,
+          monEarned: monEarnedBreakdown,
+          monRedeemed: state.monApplied ? monRedemptionBreakdown : {},
+          customer: {
+            name: shipping.name,
+            email: shipping.email
+          }
+        })
+      });
+
+      // 2. Emit Autopilot event for MonCircle SDK (Zero-Hardcode)
+      window.dispatchEvent(new CustomEvent('mon-purchase-success', {
+        detail: {
+          orderId,
+          monAmount: totalMONEarned,
+          userId: user?.id
+        }
+      }));
+
+      setFinalEarnedMON(totalMONEarned);
+      setPlaced(true);
+      setTimeout(() => dispatch({ type: "CLEAR_CART" }), 100);
+    } catch (err) {
+      console.error('Order failed:', err);
+      alert('Payment failed. Please try again.');
+    }
   };
 
   if (placed) {
@@ -91,48 +136,21 @@ export default function CheckoutPage() {
             }}
           >
             Your order is confirmed. You've earned{" "}
-            <strong style={{ color: "#6E54FF" }}>{totalMONEarned} MON</strong>{" "}
+            <strong style={{ color: "#6E54FF" }}>{finalEarnedMON.toFixed(2)} MON</strong>{" "}
             from this purchase. It'll appear in your MonVault after delivery.
           </p>
-          <div
-            style={{
-              background: "rgba(110,84,255,0.1)",
-              border: "1.5px solid rgba(110,84,255,0.25)",
-              borderRadius: "12px",
-              padding: "1rem 1.25rem",
-              marginBottom: "1.75rem",
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-            }}
-          >
-            <img
-              src="/assets/mon-token.svg"
-              alt=""
-              style={{ width: "28px", height: "28px", borderRadius: "50%" }}
-            />
-            <div style={{ textAlign: "left" }}>
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: "0.75rem",
-                  color: "#8B75FF",
-                  fontWeight: 600,
-                }}
-              >
-                Pending credit
-              </p>
-              <p
-                style={{
-                  margin: 0,
-                  fontWeight: 800,
-                  color: "#6E54FF",
-                  fontSize: "1.125rem",
-                }}
-              >
-                +{totalMONEarned} MON
-              </p>
-            </div>
+          <div style={{ marginBottom: "2rem" }}>
+            <p style={{ 
+              fontSize: "0.8125rem", 
+              fontWeight: 700, 
+              color: c.textTertiary, 
+              marginBottom: "0.75rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em"
+            }}>
+              YOUR ORDER REWARD
+            </p>
+            <ScratchCard amount={finalEarnedMON} />
           </div>
           <div
             style={{
@@ -433,6 +451,12 @@ export default function CheckoutPage() {
                         <input
                           type="text"
                           className="input"
+                          defaultValue={
+                            field.label === "Card Number" ? "4242 4242 4242 4242" :
+                            field.label === "Name on Card" ? "Arjun Singh" :
+                            field.label === "Expiry" ? "12/26" :
+                            field.label === "CVV" ? "123" : ""
+                          }
                           placeholder={field.placeholder}
                           id={`card-${field.label.replace(/\s/g, "-").toLowerCase()}`}
                         />

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Zap, Shield, TrendingUp } from "lucide-react";
-import { getFeaturedProducts, CATEGORIES } from "../data/products";
+import { getFeaturedProducts, CATEGORIES, getMONEarned } from "../data/products";
 import ProductCard from "../components/ProductCard";
 import SectionHeader from "../components/SectionHeader";
 import { useTheme } from "../context/ThemeContext";
@@ -14,11 +14,12 @@ export default function HomePage() {
       {/* HERO */}
       <section
         style={{
-          minHeight: "92vh",
+          minHeight: "80vh",
           display: "flex",
           alignItems: "center",
           background: c.heroGradient,
-          paddingTop: "64px",
+          paddingTop: "7rem",
+          paddingBottom: "2rem",
           overflow: "hidden",
           position: "relative",
         }}
@@ -93,7 +94,7 @@ export default function HomePage() {
 
             <h1
               className="text-display"
-              style={{ marginBottom: "1.25rem", color: c.textPrimary }}
+              style={{ marginBottom: "1.5rem", color: c.textPrimary }}
             >
               Shop Smart. <span style={{ color: "#6E54FF" }}>Own your</span>{" "}
               Loyalty.
@@ -104,7 +105,7 @@ export default function HomePage() {
                 fontSize: "1.125rem",
                 color: c.textSecondary,
                 lineHeight: 1.7,
-                marginBottom: "2rem",
+                marginBottom: "2.5rem",
                 maxWidth: "480px",
               }}
             >
@@ -114,7 +115,7 @@ export default function HomePage() {
               it. Your rewards, your rules.
             </p>
 
-            <div style={{ display: "flex", gap: "0.875rem", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
               <Link to="/products" className="btn-primary btn-lg">
                 Shop Now <ArrowRight size={18} />
               </Link>
@@ -127,8 +128,8 @@ export default function HomePage() {
             <div
               style={{
                 display: "flex",
-                gap: "1.5rem",
-                marginTop: "2.5rem",
+                gap: "2.5rem",
+                marginTop: "3.75rem",
                 flexWrap: "wrap",
               }}
             >
@@ -175,11 +176,11 @@ export default function HomePage() {
             <div
               style={{
                 width: "100%",
-                maxWidth: "460px",
+                maxWidth: "480px",
                 aspectRatio: "1",
-                borderRadius: "24px",
+                borderRadius: "32px",
                 overflow: "hidden",
-                boxShadow: "0 24px 60px rgba(110, 84, 255, 0.2)",
+                boxShadow: "0 24px 80px rgba(110, 84, 255, 0.25)",
                 position: "relative",
               }}
             >
@@ -192,25 +193,25 @@ export default function HomePage() {
               <div
                 style={{
                   position: "absolute",
-                  bottom: "20px",
+                  bottom: "24px",
                   left: "50%",
                   transform: "translateX(-50%)",
                   background: "rgba(255,255,255,0.95)",
                   backdropFilter: "blur(12px)",
-                  borderRadius: "14px",
-                  padding: "0.875rem 1.25rem",
+                  borderRadius: "16px",
+                  padding: "1rem 1.5rem",
                   display: "flex",
                   alignItems: "center",
-                  gap: "10px",
-                  minWidth: "220px",
-                  boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+                  gap: "12px",
+                  boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
                   border: "1px solid rgba(255,255,255,0.8)",
+                  whiteSpace: "nowrap",
                 }}
               >
                 <img
                   src="/assets/mon-token.svg"
                   alt=""
-                  style={{ width: "36px", height: "36px", borderRadius: "50%" }}
+                  style={{ width: "38px", height: "38px", borderRadius: "50%" }}
                 />
                 <div>
                   <p
@@ -218,7 +219,7 @@ export default function HomePage() {
                       margin: 0,
                       fontSize: "0.75rem",
                       color: "#A1A1AA",
-                      fontWeight: 500,
+                      fontWeight: 600,
                     }}
                   >
                     You will earn
@@ -226,18 +227,18 @@ export default function HomePage() {
                   <p
                     style={{
                       margin: 0,
-                      fontSize: "1.25rem",
+                      fontSize: "1.375rem",
                       fontWeight: 800,
                       color: "#6E54FF",
                       letterSpacing: "-0.02em",
+                      lineHeight: 1.1,
                     }}
                   >
-                    +65 MON
+                    +{getMONEarned(12999).toFixed(0)} MON
                   </p>
                 </div>
                 <div
                   style={{
-                    marginLeft: "auto",
                     padding: "4px 10px",
                     background: "#DCFCE7",
                     color: "#16A34A",

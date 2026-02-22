@@ -1,10 +1,17 @@
-import { useState } from "react";
 import { Info } from "lucide-react";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 export default function CheckoutMonCard() {
-  const { state, dispatch, cartTotal, totalMONEarned, monDiscount } = useCart();
-  const monValueInRs = Math.min(state.monBalance * 0.5, cartTotal * 0.15);
+  const { state, dispatch, cartTotal, monDiscount, maxRedeemableMON } = useCart();
+  const { user } = useAuth();
+
+  const totalUserMON = user?.balances 
+    ? Object.values(user.balances).reduce((sum, val) => sum + val, 0)
+    : 0;
+
+  const CONVERSION_RATE = 1.83;
+  const redeemableValueINR = maxRedeemableMON * CONVERSION_RATE;
 
   return (
     <div
@@ -46,11 +53,11 @@ export default function CheckoutMonCard() {
               Pay with MON
             </p>
             <p style={{ margin: 0, fontSize: "0.8rem", color: "#6E54FF" }}>
-              {state.monBalance.toLocaleString()} MON available · ₹
-              {monValueInRs.toLocaleString("en-IN", {
+              {totalUserMON.toFixed(2)} MON available · ₹
+              {redeemableValueINR.toLocaleString("en-IN", {
                 maximumFractionDigits: 0,
               })}{" "}
-              value
+              redeemable
             </p>
           </div>
         </div>
@@ -137,10 +144,10 @@ export default function CheckoutMonCard() {
                     fontWeight: 500,
                   }}
                 >
-                  MON applied
+                  MON applied ({maxRedeemableMON.toFixed(2)} MON × ₹1.83)
                 </span>
                 <div
-                  title="MON is your on-chain loyalty reward. 1 MON = ₹0.5 value on checkout."
+                  title="MON is your on-chain loyalty reward. 1 MON = ₹1.83 value on checkout."
                   style={{ color: "#A1A1AA", cursor: "help" }}
                 >
                   <Info size={13} />

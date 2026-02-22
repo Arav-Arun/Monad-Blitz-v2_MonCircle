@@ -1,13 +1,15 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { ShoppingCart, User, Menu, X, Zap, Sun, Moon } from "lucide-react";
+import { ShoppingCart, LogOut, Menu, X, Zap, Sun, Moon } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { useTheme } from "../context/ThemeContext";
+import { useAuth } from "../context/AuthContext";
 import MonBalanceChip from "./MonBalanceChip";
 
 export default function Navbar() {
   const { cartCount } = useCart();
   const { isDark, toggleTheme } = useTheme();
+  const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
@@ -134,58 +136,98 @@ export default function Navbar() {
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "8px",
+            gap: "16px",
             marginLeft: "auto",
           }}
         >
           <MonBalanceChip />
 
-          {/* Dark mode toggle */}
-          <button
-            id="theme-toggle-btn"
-            onClick={toggleTheme}
-            style={iconBtnStyle}
-            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-            title={isDark ? "Light mode" : "Dark mode"}
-          >
-            {isDark ? <Sun size={17} /> : <Moon size={17} />}
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            {/* Dark mode toggle */}
+            <button
+              id="theme-toggle-btn"
+              onClick={toggleTheme}
+              style={iconBtnStyle}
+              aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+              title={isDark ? "Light mode" : "Dark mode"}
+            >
+              {isDark ? <Sun size={17} /> : <Moon size={17} />}
+            </button>
 
-          <button
-            id="navbar-cart-btn"
-            onClick={() => navigate("/cart")}
-            style={{ ...iconBtnStyle, position: "relative" }}
-            aria-label="Cart"
-          >
-            <ShoppingCart size={17} />
-            {cartCount > 0 && (
-              <span
+            <button
+              id="navbar-cart-btn"
+              onClick={() => navigate("/cart")}
+              style={{ ...iconBtnStyle, position: "relative" }}
+              aria-label="Cart"
+            >
+              <ShoppingCart size={17} />
+              {cartCount > 0 && (
+                <span
+                  style={{
+                    position: "absolute",
+                    top: "-4px",
+                    right: "-4px",
+                    background: "#6E54FF",
+                    color: "white",
+                    fontSize: "0.65rem",
+                    fontWeight: 700,
+                    borderRadius: "999px",
+                    minWidth: "16px",
+                    height: "16px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "0 4px",
+                    lineHeight: 1,
+                  }}
+                >
+                  {cartCount}
+                </span>
+              )}
+            </button>
+
+            {user ? (
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <div
+                  style={{
+                    padding: "6px 12px",
+                    borderRadius: "8px",
+                    background: isDark ? "rgba(255,255,255,0.05)" : "#F4F4F5",
+                    fontSize: "0.8125rem",
+                    fontWeight: 600,
+                    color: isDark ? "#E4E4E7" : "#3F3F46",
+                    border: `1px solid ${isDark ? "#27272a" : "#E4E4E7"}`,
+                  }}
+                >
+                  {user.name.split(" ")[0]}
+                </div>
+                <button
+                  onClick={logout}
+                  style={{
+                    ...iconBtnStyle,
+                    borderColor: isDark ? "rgba(220,38,38,0.3)" : "rgba(220,38,38,0.1)",
+                    color: "#DC2626",
+                    background: isDark ? "rgba(220,38,38,0.05)" : "rgba(220,38,38,0.03)",
+                  }}
+                  title="Log Out"
+                >
+                  <LogOut size={17} />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => navigate("/login")}
+                className="btn-primary"
                 style={{
-                  position: "absolute",
-                  top: "-4px",
-                  right: "-4px",
-                  background: "#6E54FF",
-                  color: "white",
-                  fontSize: "0.65rem",
-                  fontWeight: 700,
-                  borderRadius: "999px",
-                  minWidth: "16px",
-                  height: "16px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "0 4px",
-                  lineHeight: 1,
+                  padding: "8px 16px",
+                  fontSize: "0.8125rem",
+                  height: "38px",
                 }}
               >
-                {cartCount}
-              </span>
+                Log In
+              </button>
             )}
-          </button>
-
-          <button style={iconBtnStyle} aria-label="Account">
-            <User size={17} />
-          </button>
+          </div>
 
           {/* Mobile menu btn */}
           <button

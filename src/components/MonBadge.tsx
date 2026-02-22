@@ -22,7 +22,7 @@ export default function MonBadge({ amount, size = "md" }: MonBadgeProps) {
           borderRadius: "50%",
         }}
       />
-      +{amount} MON
+      +{amount.toFixed(2)} MON
     </span>
   );
 }

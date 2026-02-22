@@ -215,7 +215,7 @@ body {
 
 @media (min-width: 1024px) {
   .container-page {
-    padding: 0 3rem;
+    padding: 0 4rem;
   }
 }
 
@@ -422,16 +422,16 @@ body {
    ============================================ */
 
 .section {
-  padding: 4rem 0;
+  padding: 3rem 0;
 }
 
 .section-sm {
-  padding: 2.5rem 0;
+  padding: 2rem 0;
 }
 
 @media (min-width: 768px) {
   .section {
-    padding: 5rem 0;
+    padding: 4rem 0;
   }
 }
 

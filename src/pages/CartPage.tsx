@@ -61,10 +61,8 @@ export default function CartPage() {
 
   const brandBreakdown = state.items.reduce<Record<string, number>>(
     (acc, item) => {
-      const mon =
-        getMONEarned(item.product.price, item.product.monEarnRate) *
-        item.quantity;
-      acc[item.product.brand] = (acc[item.product.brand] || 0) + mon;
+      const mon = Number(((item.product.price * item.quantity * 0.01) / 1.83).toFixed(2));
+      acc[item.product.brand] = Number(((acc[item.product.brand] || 0) + mon).toFixed(2));
       return acc;
     },
     {},
@@ -105,7 +103,7 @@ export default function CartPage() {
           }}
         >
           {cartCount} item{cartCount !== 1 ? "s" : ""} · Earn{" "}
-          <strong style={{ color: "#6E54FF" }}>{totalMONEarned} MON</strong> on
+          <strong style={{ color: "#6E54FF" }}>{totalMONEarned.toFixed(2)} MON</strong> on
           this order
         </p>
 
@@ -120,9 +118,7 @@ export default function CartPage() {
           {/* Items */}
           <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
             {state.items.map((item) => {
-              const monEarned =
-                getMONEarned(item.product.price, item.product.monEarnRate) *
-                item.quantity;
+              const monEarned = Number(((item.product.price * item.quantity * 0.005) / 1.83).toFixed(2));
               return (
                 <div
                   key={item.product.id}

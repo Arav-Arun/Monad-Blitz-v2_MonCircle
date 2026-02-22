@@ -44,7 +44,7 @@ export default function ProductDetailPage() {
     );
   }
 
-  const monEarned = getMONEarned(product.price, product.monEarnRate);
+  const monEarned = getMONEarned(product.price).toFixed(2);
   const related = PRODUCTS.filter(
     (p) => p.category === product.category && p.id !== product.id,
   ).slice(0, 3);

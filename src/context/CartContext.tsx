@@ -2,10 +2,12 @@ import {
   createContext,
   useContext,
   useReducer,
+  useMemo,
   type Dispatch,
   type ReactNode,
 } from "react";
 import type { Product } from "../data/products";
+import { useAuth } from "./AuthContext";
 
 export interface CartItem {
   product: Product;
@@ -14,7 +16,6 @@ export interface CartItem {
 
 interface CartState {
   items: CartItem[];
-  monBalance: number;
   monApplied: boolean;
 }
 
@@ -27,7 +28,6 @@ type CartAction =
 
 const initialState: CartState = {
   items: [],
-  monBalance: 1240,
   monApplied: false,
 };
 
@@ -87,30 +87,61 @@ const CartContext = createContext<{
   cartTotal: number;
   cartCount: number;
   totalMONEarned: number;
+  monEarnedBreakdown: Record<string, number>;
   monDiscount: number;
+  maxRedeemableMON: number;
+  monRedemptionBreakdown: Record<string, number>;
 } | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, initialState);
+  const { user } = useAuth();
 
-  const cartTotal = state.items.reduce(
+  const REWARD_ALLOCATION = 0.01;
+  const CONVERSION_RATE = 1.83; // 1 MON = 1.83 INR for earning, also for spending (user request: "same conversion rate")
+
+  const cartTotal = useMemo(() => state.items.reduce(
     (sum, item) => sum + item.product.price * item.quantity,
     0,
-  );
+  ), [state.items]);
 
-  const cartCount = state.items.reduce((sum, item) => sum + item.quantity, 0);
+  const cartCount = useMemo(() => state.items.reduce((sum, item) => sum + item.quantity, 0), [state.items]);
 
-  const totalMONEarned = state.items.reduce((sum, item) => {
-    const monPer = Math.round(
-      (item.product.price / 100) * item.product.monEarnRate * 100,
-    );
-    return sum + monPer * item.quantity;
-  }, 0);
+  // Breakdown of MON earned per brand in this cart
+  const monEarnedBreakdown = useMemo(() => {
+    const breakdown: Record<string, number> = {};
+    state.items.forEach(item => {
+      const earned = (item.product.price * item.quantity * REWARD_ALLOCATION) / CONVERSION_RATE;
+      breakdown[item.product.brand] = Number(((breakdown[item.product.brand] || 0) + earned).toFixed(2));
+    });
+    return breakdown;
+  }, [state.items]);
 
-  // 1 MON = ₹0.5 fiat value
-  const monDiscount = state.monApplied
-    ? Math.min(state.monBalance * 0.5, cartTotal * 0.15)
-    : 0;
+  const totalMONEarned = useMemo(() => 
+    Object.values(monEarnedBreakdown).reduce((sum, val) => sum + val, 0)
+  , [monEarnedBreakdown]);
+
+  // Redemption logic: GLOBAL REDEMPTION for Demo
+  const { maxRedeemableMON, monRedemptionBreakdown } = useMemo(() => {
+    if (!user || !user.balances) return { maxRedeemableMON: 0, monRedemptionBreakdown: {} };
+    
+    const totalUserMON = Object.values(user.balances).reduce((sum, val) => sum + (val as number), 0);
+    if (totalUserMON <= 0) return { maxRedeemableMON: 0, monRedemptionBreakdown: {} };
+
+    // Cap at 50% of entire order total for simplicity and "Wow" factor
+    const maxDiscountINR = cartTotal * 0.5;
+    const maxSpendableInMON = maxDiscountINR / CONVERSION_RATE;
+    
+    const actuallyRedeemable = Math.min(totalUserMON, maxSpendableInMON);
+    
+    // For the breakdown, we'll just attribute it to the brands in the cart proportionally
+    // to maintain backend consistency, or just send a global "redemption" brand.
+    const breakdown: Record<string, number> = { "Global": Number(actuallyRedeemable.toFixed(2)) };
+
+    return { maxRedeemableMON: Number(actuallyRedeemable.toFixed(2)), monRedemptionBreakdown: breakdown };
+  }, [user, state.items, cartTotal]);
+
+  const monDiscount = state.monApplied ? maxRedeemableMON * CONVERSION_RATE : 0;
 
   return (
     <CartContext.Provider
@@ -120,7 +151,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         cartTotal,
         cartCount,
         totalMONEarned,
+        monEarnedBreakdown,
         monDiscount,
+        maxRedeemableMON,
+        monRedemptionBreakdown,
       }}
     >
       {children}

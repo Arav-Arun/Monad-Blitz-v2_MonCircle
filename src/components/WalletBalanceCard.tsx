@@ -14,7 +14,7 @@ export default function WalletBalanceCard({
   totalSpent,
   onSpend,
 }: WalletBalanceCardProps) {
-  const fiatEquivalent = (balance * 0.5).toLocaleString("en-IN", {
+  const fiatEquivalent = (balance * 1.83).toLocaleString("en-IN", {
     maximumFractionDigits: 0,
   });
 
@@ -23,34 +23,37 @@ export default function WalletBalanceCard({
       style={{
         background:
           "linear-gradient(135deg, #6E54FF 0%, #5540D9 60%, #3D2EAA 100%)",
-        borderRadius: "20px",
-        padding: "2rem",
+        borderRadius: "24px",
+        padding: "2.5rem",
         color: "white",
         position: "relative",
         overflow: "hidden",
+        boxShadow: "0 20px 50px rgba(110, 84, 255, 0.3)",
       }}
     >
       {/* Background decoration */}
       <div
         style={{
           position: "absolute",
-          top: "-60px",
-          right: "-60px",
-          width: "200px",
-          height: "200px",
+          top: "-30px",
+          right: "-30px",
+          width: "180px",
+          height: "180px",
           borderRadius: "50%",
-          background: "rgba(255,255,255,0.06)",
+          background: "rgba(255,255,255,0.1)",
+          filter: "blur(40px)",
         }}
       />
       <div
         style={{
           position: "absolute",
           bottom: "-40px",
-          left: "40%",
-          width: "150px",
-          height: "150px",
+          left: "20%",
+          width: "120px",
+          height: "120px",
           borderRadius: "50%",
-          background: "rgba(255,255,255,0.04)",
+          background: "rgba(255,255,255,0.05)",
+          filter: "blur(30px)",
         }}
       />
 
@@ -60,51 +63,63 @@ export default function WalletBalanceCard({
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "8px",
-            marginBottom: "1.5rem",
+            gap: "10px",
+            marginBottom: "1.75rem",
           }}
         >
-          <Wallet size={18} color="rgba(255,255,255,0.7)" />
+          <div style={{ 
+            padding: "6px", 
+            background: "rgba(255,255,255,0.15)", 
+            borderRadius: "8px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}>
+            <Wallet size={16} />
+          </div>
           <span
             style={{
-              fontSize: "0.875rem",
-              fontWeight: 500,
-              color: "rgba(255,255,255,0.7)",
-              letterSpacing: "0.05em",
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              color: "rgba(255,255,255,0.85)",
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
             }}
           >
-            MON BALANCE
+            Universal Balance
           </span>
         </div>
 
         {/* Balance */}
-        <div style={{ marginBottom: "0.5rem" }}>
-          <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
+        <div style={{ marginBottom: "0.25rem" }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
             <img
               src="/assets/mon-token.svg"
               alt="MON"
               style={{
-                width: "28px",
-                height: "28px",
+                width: "32px",
+                height: "32px",
                 borderRadius: "50%",
                 flexShrink: 0,
+                border: "2px solid rgba(255,255,255,0.2)"
               }}
             />
             <span
               style={{
-                fontSize: "clamp(2.5rem, 5vw, 3.5rem)",
+                fontSize: "clamp(2.5rem, 6vw, 4rem)",
                 fontWeight: 800,
                 letterSpacing: "-0.04em",
                 lineHeight: 1,
               }}
             >
-              {balance.toLocaleString()}
+              {balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
             <span
               style={{
-                fontSize: "1.5rem",
+                fontSize: "1.25rem",
                 fontWeight: 600,
                 color: "rgba(255,255,255,0.7)",
+                marginLeft: "4px"
               }}
             >
               MON
@@ -114,22 +129,26 @@ export default function WalletBalanceCard({
 
         <p
           style={{
-            margin: "0 0 2rem",
-            fontSize: "0.9rem",
+            margin: "0 0 2.5rem",
+            fontSize: "1rem",
             color: "rgba(255,255,255,0.6)",
             fontWeight: 500,
           }}
         >
-          ≈ ₹{fiatEquivalent} fiat value
+          ≈ ₹{fiatEquivalent} market value
         </p>
 
         {/* Stats */}
         <div
           style={{
-            display: "flex",
-            gap: "1.5rem",
-            marginBottom: "1.75rem",
-            flexWrap: "wrap",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "1rem",
+            marginBottom: "2rem",
+            background: "rgba(0,0,0,0.1)",
+            padding: "1.25rem",
+            borderRadius: "16px",
+            border: "1px solid rgba(255,255,255,0.05)"
           }}
         >
           <div>
@@ -137,80 +156,83 @@ export default function WalletBalanceCard({
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "4px",
-                marginBottom: "2px",
+                gap: "6px",
+                marginBottom: "4px",
               }}
             >
-              <TrendingUp size={13} color="rgba(255,255,255,0.6)" />
+              <TrendingUp size={14} color="#4ADE80" />
               <span
                 style={{
-                  fontSize: "0.75rem",
+                  fontSize: "0.7rem",
                   color: "rgba(255,255,255,0.6)",
-                  fontWeight: 500,
+                  fontWeight: 600,
+                  textTransform: "uppercase"
                 }}
               >
-                Total earned
+                Earnings
               </span>
             </div>
-            <span style={{ fontSize: "1.125rem", fontWeight: 700 }}>
-              +{totalEarned.toLocaleString()} MON
+            <span style={{ fontSize: "1.25rem", fontWeight: 800 }}>
+              {totalEarned.toLocaleString()}
             </span>
           </div>
-          <div
-            style={{
-              width: "1px",
-              background: "rgba(255,255,255,0.15)",
-              alignSelf: "stretch",
-            }}
-          />
           <div>
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "4px",
-                marginBottom: "2px",
+                gap: "6px",
+                marginBottom: "4px",
               }}
             >
-              <ArrowDownRight size={13} color="rgba(255,255,255,0.6)" />
+              <ArrowDownRight size={14} color="#F87171" />
               <span
                 style={{
-                  fontSize: "0.75rem",
+                  fontSize: "0.7rem",
                   color: "rgba(255,255,255,0.6)",
-                  fontWeight: 500,
+                  fontWeight: 600,
+                  textTransform: "uppercase"
                 }}
               >
-                Total spent
+                Redeemed
               </span>
             </div>
-            <span style={{ fontSize: "1.125rem", fontWeight: 700 }}>
-              −{totalSpent.toLocaleString()} MON
+            <span style={{ fontSize: "1.25rem", fontWeight: 800 }}>
+              {totalSpent.toLocaleString()}
             </span>
           </div>
         </div>
 
         {/* Actions */}
-        <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "1rem" }}>
           <button
             id="wallet-spend-btn"
             onClick={onSpend}
             style={{
               flex: 1,
-              padding: "0.75rem",
+              height: "48px",
+              padding: "0 1.5rem",
               background: "white",
               color: "#6E54FF",
               border: "none",
               borderRadius: "12px",
               fontWeight: 700,
-              fontSize: "0.875rem",
+              fontSize: "0.9375rem",
               cursor: "pointer",
-              transition: "all 0.15s",
+              transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
               letterSpacing: "0.01em",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "#F3F1FF")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "white")}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "scale(1.02)";
+              e.currentTarget.style.boxShadow = "0 6px 20px rgba(255,255,255,0.2)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
+              e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
+            }}
           >
-            Spend MON →
+            Start Shopping
           </button>
         </div>
       </div>

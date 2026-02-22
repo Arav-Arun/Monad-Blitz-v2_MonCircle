@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
-import { ShoppingCart, Star } from "lucide-react";
+import { ShoppingCart, Star, Plus, Minus } from "lucide-react";
 import { type Product, getMONEarned } from "../data/products";
 import { useCart } from "../context/CartContext";
 import { useTheme } from "../context/ThemeContext";
+import { useToast } from "../context/ToastContext";
 import MonBadge from "./MonBadge";
 
 interface ProductCardProps {
@@ -10,9 +11,18 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const { dispatch } = useCart();
+  const { state, dispatch } = useCart();
   const { c } = useTheme();
-  const monEarned = getMONEarned(product.price, product.monEarnRate);
+  const { showToast } = useToast();
+  const monEarned = getMONEarned(product.price);
+
+  const cartItem = state.items.find((item) => item.product.id === product.id);
+  const quantity = cartItem ? cartItem.quantity : 0;
+
+  const handleAddToCart = () => {
+    dispatch({ type: "ADD_ITEM", product });
+    showToast(`${product.name} added to cart!`, 'success');
+  };
 
   return (
     <article
@@ -150,16 +160,78 @@ export default function ProductCard({ product }: ProductCardProps) {
           <MonBadge amount={monEarned} size="sm" />
         </div>
 
-        {/* Add to cart */}
-        <button
-          id={`add-to-cart-${product.id}`}
-          onClick={() => dispatch({ type: "ADD_ITEM", product })}
-          className="btn-primary"
-          style={{ marginTop: "0.5rem", width: "100%" }}
-        >
-          <ShoppingCart size={15} />
-          Add to Cart
-        </button>
+        {/* Add to cart / Quantity selector */}
+        {quantity > 0 ? (
+          <div
+            style={{
+              marginTop: "0.5rem",
+              display: "flex",
+              alignItems: "center",
+              background: "#F3F1FF",
+              borderRadius: "10px",
+              padding: "4px",
+              border: "1.5px solid rgba(110,84,255,0.2)",
+            }}
+          >
+            <button
+              onClick={() => dispatch({ type: "UPDATE_QTY", productId: product.id, quantity: quantity - 1 })}
+              style={{
+                width: "32px",
+                height: "32px",
+                borderRadius: "8px",
+                border: "none",
+                background: "white",
+                color: "#6E54FF",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+              }}
+            >
+              <Minus size={14} />
+            </button>
+            <span
+              style={{
+                flex: 1,
+                textAlign: "center",
+                fontSize: "0.9375rem",
+                fontWeight: 700,
+                color: "#6E54FF",
+              }}
+            >
+              {quantity}
+            </span>
+            <button
+              onClick={() => dispatch({ type: "UPDATE_QTY", productId: product.id, quantity: quantity + 1 })}
+              style={{
+                width: "32px",
+                height: "32px",
+                borderRadius: "8px",
+                border: "none",
+                background: "#6E54FF",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                boxShadow: "0 2px 8px rgba(110,84,255,0.3)",
+              }}
+            >
+              <Plus size={14} />
+            </button>
+          </div>
+        ) : (
+          <button
+            id={`add-to-cart-${product.id}`}
+            onClick={handleAddToCart}
+            className="btn-primary"
+            style={{ marginTop: "0.5rem", width: "100%", justifyContent: "center" }}
+          >
+            <ShoppingCart size={15} />
+            Add to Cart
+          </button>
+        )}
       </div>
     </article>
   );

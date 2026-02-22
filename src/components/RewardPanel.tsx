@@ -13,12 +13,10 @@ export default function RewardPanel({
   const brandBreakdown = state.items.reduce<
     Record<string, { mon: number; brand: string }>
   >((acc, item) => {
-    const monPer = Math.round(
-      (item.product.price / 100) * item.product.monEarnRate * 100,
-    );
+    const monPer = Number(((item.product.price * item.quantity * 0.01) / 1.83).toFixed(2));
     const key = item.product.brand;
     if (!acc[key]) acc[key] = { mon: 0, brand: key };
-    acc[key].mon += monPer * item.quantity;
+    acc[key].mon = Number((acc[key].mon + monPer).toFixed(2));
     return acc;
   }, {});
 
@@ -74,7 +72,7 @@ export default function RewardPanel({
             lineHeight: 1,
           }}
         >
-          +{totalMONEarned}
+          +{totalMONEarned.toFixed(2)}
         </span>
         <span style={{ fontSize: "1rem", fontWeight: 600, color: "#8B75FF" }}>
           MON
@@ -115,7 +113,7 @@ export default function RewardPanel({
                   color: "#6E54FF",
                 }}
               >
-                +{entry.mon} MON
+                +{entry.mon.toFixed(2)} MON
               </span>
             </div>
           ))}

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MonCircle | Loyalty Dashboard</title>
+    <style>
+        :root {
+            --bg: #0a0812;
+            --card: #0f0d1a;
+            --border: #1e1b2e;
+            --primary: #6e54ff;
+            --text: #e8e4f4;
+            --dim: #6b6585;
+        }
+
+        body {
+            font-family: 'Geist', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 40px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        p {
+            color: var(--dim);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .stat {
+            margin-bottom: 20px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--dim);
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .feed {
+            margin-top: 20px;
+            font-size: 12px;
+            color: var(--dim);
+            border-top: 1px solid var(--border);
+            padding-top: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="max-width: 1200px; margin: 0 auto 40px;">
+        <h1>Loyalty Dashboard</h1>
+        <p>Connected to <b>pk_live_67df231b188e46d38a2baef03b217756</b> • Monad Testnet</p>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <div class="stat">
+                <div class="stat-label">Wallet Balance</div>
+                <div class="stat-value" id="dash-balance">0 MON</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Recent Activity</div>
+                <div class="feed" id="dash-feed">Waiting for transactions...</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Test Purchase</h3>
+            <p>Simulate a customer purchase to see Autopilot mode in action.</p>
+            <input type="number" id="purchase-amt" value="500"
+                style="width:100%; background:#141121; border:1px solid var(--border); padding:10px; border-radius:8px; color:white; margin-bottom:12px;">
+            <button class="btn" onclick="simulatePurchase()">Place Order (Earn MON)</button>
+        </div>
+    </div>
+
+    <script>
+        function simulatePurchase() {
+            const amt = document.getElementById('purchase-amt').value;
+            const orderId = "ORD-" + Math.random().toString(36).slice(2, 9).toUpperCase();
+
+            // Emit Autopilot Event
+            window.dispatchEvent(new CustomEvent('mon-purchase-success', {
+                detail: { orderId, monAmount: (amt / 100) * 10 }
+            }));
+
+            const feed = document.getElementById('dash-feed');
+            feed.innerHTML = "<div>Processed " + orderId + " • " + amt + " INR</div>" + feed.innerHTML;
+        }
+    </script>
+
+    <!-- MonCircle SDK Overlay -->
+    <script src="https://moncircle.vercel.app/sdk/overlay.js" data-key="pk_live_67df231b188e46d38a2baef03b217756"
+        data-user-id="demo_user_123" data-autopilot="true" data-mon-amount="10">
+        </script>
+</body>
+
+</html>
