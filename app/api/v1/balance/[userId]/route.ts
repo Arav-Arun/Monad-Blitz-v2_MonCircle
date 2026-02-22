@@ -4,13 +4,13 @@ import { UserBalance, Platform } from '@/models';
 
 export async function GET(
     req: Request,
-    { params }: { params: { userId: string } }
+    { params }: { params: Promise<{ userId: string }> }
 ) {
     try {
         await dbConnect();
         const { searchParams } = new URL(req.url);
         const key = searchParams.get('apiKey');
-        const userId = params.userId;
+        const { userId } = await params;
 
         if (!key) {
             return NextResponse.json({ error: 'API key required' }, { status: 401 });
