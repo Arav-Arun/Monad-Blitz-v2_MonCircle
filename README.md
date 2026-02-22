@@ -1,4 +1,4 @@
-# MonCircle — Decentralized Loyalty Infrastructure for E-Commerce
+# MonCircle : Decentralized Loyalty Infrastructure for E-Commerce
 
 **MonCircle** is a plug-and-play, on-chain loyalty infrastructure built on Monad that enables brands and marketplaces to launch programmable customer reward economies directly inside their commerce platforms.
 
