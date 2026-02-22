@@ -1,9 +1,8 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { CheckCircle, CreditCard, Lock, Truck } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useTheme } from "../context/ThemeContext";
-import { useAuth } from "../context/AuthContext";
 import CheckoutMonCard from "../components/CheckoutMonCard";
 import RewardPanel from "../components/RewardPanel";
 import ScratchCard from "../components/ScratchCard";
@@ -31,21 +30,32 @@ const INITIAL_SHIPPING: ShippingData = {
 };
 
 export default function CheckoutPage() {
-  const { 
-    state, 
-    cartTotal, 
-    totalMONEarned, 
-    monDiscount, 
-    dispatch, 
-    monEarnedBreakdown, 
-    monRedemptionBreakdown 
+  const {
+    state,
+    cartTotal,
+    totalMONEarned,
+    monDiscount,
+    dispatch,
+    monEarnedBreakdown,
+    monRedemptionBreakdown,
   } = useCart();
   const { c } = useTheme();
-  const { user } = useAuth();
+  // Remove auth dependency - use localStorage for guest users
+  const [guestUserId, setGuestUserId] = useState<string>("");
   const [step, setStep] = useState<Step>("shipping");
   const [shipping, setShipping] = useState<ShippingData>(INITIAL_SHIPPING);
   const [placed, setPlaced] = useState(false);
   const [finalEarnedMON, setFinalEarnedMON] = useState(0);
+
+  // Generate or retrieve guest user ID from localStorage
+  React.useEffect(() => {
+    let userId = localStorage.getItem("guest_user_id");
+    if (!userId) {
+      userId = "guest_" + Math.random().toString(36).slice(2, 15);
+      localStorage.setItem("guest_user_id", userId);
+    }
+    setGuestUserId(userId);
+  }, []);
 
   const finalTotal = Math.round(cartTotal - monDiscount);
   const taxes = Math.round(cartTotal * 0.18);
@@ -53,38 +63,41 @@ export default function CheckoutPage() {
   const handlePlaceOrder = async () => {
     try {
       // 1. Save order to our new MonMart backend (server.js)
-      const orderId = "ORD-" + Math.random().toString(36).slice(2, 9).toUpperCase();
-      await fetch('http://localhost:5000/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const orderId =
+        "ORD-" + Math.random().toString(36).slice(2, 9).toUpperCase();
+      await fetch("http://localhost:5000/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           orderId,
           total: finalTotal + taxes,
-          userId: user?.id,
+          userId: guestUserId,
           monEarned: monEarnedBreakdown,
           monRedeemed: state.monApplied ? monRedemptionBreakdown : {},
           customer: {
             name: shipping.name,
-            email: shipping.email
-          }
-        })
+            email: shipping.email,
+          },
+        }),
       });
 
       // 2. Emit Autopilot event for MonCircle SDK (Zero-Hardcode)
-      window.dispatchEvent(new CustomEvent('mon-purchase-success', {
-        detail: {
-          orderId,
-          monAmount: totalMONEarned,
-          userId: user?.id
-        }
-      }));
+      window.dispatchEvent(
+        new CustomEvent("mon-purchase-success", {
+          detail: {
+            orderId,
+            monAmount: totalMONEarned,
+            userId: guestUserId,
+          },
+        }),
+      );
 
       setFinalEarnedMON(totalMONEarned);
       setPlaced(true);
       setTimeout(() => dispatch({ type: "CLEAR_CART" }), 100);
     } catch (err) {
-      console.error('Order failed:', err);
-      alert('Payment failed. Please try again.');
+      console.error("Order failed:", err);
+      alert("Payment failed. Please try again.");
     }
   };
 
@@ -136,18 +149,22 @@ export default function CheckoutPage() {
             }}
           >
             Your order is confirmed. You've earned{" "}
-            <strong style={{ color: "#6E54FF" }}>{finalEarnedMON.toFixed(2)} MON</strong>{" "}
+            <strong style={{ color: "#6E54FF" }}>
+              {finalEarnedMON.toFixed(2)} MON
+            </strong>{" "}
             from this purchase. It'll appear in your MonVault after delivery.
           </p>
           <div style={{ marginBottom: "2rem" }}>
-            <p style={{ 
-              fontSize: "0.8125rem", 
-              fontWeight: 700, 
-              color: c.textTertiary, 
-              marginBottom: "0.75rem",
-              textTransform: "uppercase",
-              letterSpacing: "0.05em"
-            }}>
+            <p
+              style={{
+                fontSize: "0.8125rem",
+                fontWeight: 700,
+                color: c.textTertiary,
+                marginBottom: "0.75rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+              }}
+            >
               YOUR ORDER REWARD
             </p>
             <ScratchCard amount={finalEarnedMON} />
@@ -452,10 +469,15 @@ export default function CheckoutPage() {
                           type="text"
                           className="input"
                           defaultValue={
-                            field.label === "Card Number" ? "4242 4242 4242 4242" :
-                            field.label === "Name on Card" ? "Arjun Singh" :
-                            field.label === "Expiry" ? "12/26" :
-                            field.label === "CVV" ? "123" : ""
+                            field.label === "Card Number"
+                              ? "4242 4242 4242 4242"
+                              : field.label === "Name on Card"
+                                ? "Arjun Singh"
+                                : field.label === "Expiry"
+                                  ? "12/26"
+                                  : field.label === "CVV"
+                                    ? "123"
+                                    : ""
                           }
                           placeholder={field.placeholder}
                           id={`card-${field.label.replace(/\s/g, "-").toLowerCase()}`}
