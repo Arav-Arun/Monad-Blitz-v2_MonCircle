@@ -1,6 +1,10 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Zap, Shield, TrendingUp } from "lucide-react";
-import { getFeaturedProducts, CATEGORIES, getMONEarned } from "../data/products";
+import {
+  getFeaturedProducts,
+  CATEGORIES,
+  getMONEarned,
+} from "../data/products";
 import ProductCard from "../components/ProductCard";
 import SectionHeader from "../components/SectionHeader";
 import { useTheme } from "../context/ThemeContext";
@@ -598,63 +602,50 @@ export default function HomePage() {
             <div
               style={{
                 borderRadius: "16px",
-                overflow: "hidden",
+                padding: "2rem",
+                background: c.promoBg,
+                border: `1.5px solid ${c.promoBorder}`,
                 position: "relative",
-                minHeight: "220px",
+                overflow: "visible",
               }}
             >
-              <img
-                src="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=700&q=80"
-                alt="New arrivals"
+              <p
                 style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  display: "block",
-                }}
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  background:
-                    "linear-gradient(to right, rgba(0,0,0,0.7) 0%, transparent 70%)",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "flex-end",
-                  padding: "2rem",
+                  fontSize: "0.8rem",
+                  fontWeight: 700,
+                  color: "#6E54FF",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                  marginBottom: "0.5rem",
                 }}
               >
-                <p
-                  style={{
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    color: "rgba(255,255,255,0.7)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.08em",
-                    marginBottom: "0.5rem",
-                  }}
-                >
-                  New In
-                </p>
-                <h3
-                  style={{
-                    fontSize: "1.375rem",
-                    fontWeight: 800,
-                    color: "white",
-                    margin: "0 0 0.875rem",
-                    letterSpacing: "-0.02em",
-                  }}
-                >
-                  Studio Collection
-                </h3>
-                <Link
-                  to="/products?category=apparel"
-                  className="btn-primary btn-sm"
-                >
-                  Explore <ArrowRight size={13} />
-                </Link>
-              </div>
+                New In
+              </p>
+              <h3
+                style={{
+                  fontSize: "1.375rem",
+                  fontWeight: 800,
+                  color: c.textPrimary,
+                  margin: "0 0 0.75rem",
+                  letterSpacing: "-0.02em",
+                }}
+              >
+                Studio Collection
+              </h3>
+              <p
+                style={{
+                  color: c.textSecondary,
+                  fontSize: "0.875rem",
+                  margin: "0 0 1.25rem",
+                  lineHeight: 1.6,
+                }}
+              >
+                Discover our latest apparel pieces with premium materials and
+                modern designs.
+              </p>
+              <Link to="/products?category=apparel" className="btn-secondary">
+                Explore <ArrowRight size={13} />
+              </Link>
             </div>
           </div>
         </div>

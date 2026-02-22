@@ -45,7 +45,7 @@ export const LIGHT = {
   promoBorder: "#D5CCFF",
 } as const;
 
-export type ThemeColors = typeof DARK;
+export type ThemeColors = typeof DARK | typeof LIGHT;
 
 interface ThemeContextValue {
   theme: Theme;
