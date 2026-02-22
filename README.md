@@ -4,6 +4,9 @@
 
 Unlike traditional loyalty points that remain locked inside individual apps, MonCircle issues **MON**, a real on-chain asset owned by the user , enabling interoperable, revocable, and behavior-aware loyalty across multiple brands and platforms.
 
+E commerce demo : https://moncircle.vercel.app
+Admin page : https://moncircle.vercel.app/
+
 ---
 
 # System Architecture
