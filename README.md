@@ -2,7 +2,7 @@
 
 **MonCircle** is a plug-and-play, on-chain loyalty infrastructure built on Monad that enables brands and marketplaces to launch programmable customer reward economies directly inside their commerce platforms.
 
-Unlike traditional loyalty points that remain locked inside individual apps, MonCircle issues **MON** — a real on-chain asset owned by the user — enabling interoperable, revocable, and behavior-aware loyalty across multiple brands and platforms.
+Unlike traditional loyalty points that remain locked inside individual apps, MonCircle issues **MON**, a real on-chain asset owned by the user , enabling interoperable, revocable, and behavior-aware loyalty across multiple brands and platforms.
 
 ---
 
@@ -144,7 +144,3 @@ With MonCircle:
 
 - **Built for consumer applications**  
   Monad is optimized for high-frequency use cases like payments, gaming, and commerce — structurally aligned with loyalty infrastructure needs.
-
----
-
-**In short:** Ethereum makes digital ownership possible; Monad makes it practical for everyday commerce.
